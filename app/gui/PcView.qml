@@ -44,6 +44,23 @@ CenteredGridView {
         ComputerManager.computerAddCompleted.disconnect(addComplete)
     }
 
+    Connections {
+        target: computerModel
+        function onSessionCreated(appName, session) {
+            var component = Qt.createComponent("StreamSegue.qml")
+            var segue = component.createObject(stackView, {
+                "appName": appName,
+                "session": session
+            })
+            stackView.push(segue)
+        }
+        function onShowAppView(computerIndex) {
+            var component = Qt.createComponent("AppView.qml")
+            var appView = component.createObject(stackView, {"computerIndex": computerIndex, "objectName": computerModel.data(computerModel.index(computerIndex, 0), ComputerModel.NameRole)})
+            stackView.push(appView)
+        }
+    }
+
     function pairingComplete(error)
     {
         // Close the PIN dialog
@@ -230,10 +247,8 @@ CenteredGridView {
                     errorDialog.open()
                 }
                 else if (model.paired) {
-                    // go to game view
-                    var component = Qt.createComponent("AppView.qml")
-                    var appView = component.createObject(stackView, {"computerIndex": index, "objectName": model.name})
-                    stackView.push(appView)
+                    // Directly stream Desktop instead of showing the app grid
+                    computerModel.findAndStreamDesktop(index)
                 }
                 else {
                     var pin = computerModel.generatePinString()

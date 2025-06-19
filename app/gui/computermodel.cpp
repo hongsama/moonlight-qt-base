@@ -1,4 +1,7 @@
 #include "computermodel.h"
+#include "backend/computermanager.h"
+#include "utils.h"
+#include <QGuiApplication>
 
 #include <QThreadPool>
 
@@ -240,6 +243,27 @@ void ComputerModel::handleComputerStateChanged(NvComputer* computer)
         int index = m_Computers.indexOf(computer);
         emit dataChanged(createIndex(index, 0), createIndex(index, 0));
     }
+}
+
+void ComputerModel::findAndStreamDesktop(int computerIndex)
+{
+    NvComputer* computer = m_Computers[computerIndex];
+
+    for (int i = 0; i < computer->appList.length(); i++) {
+        if (computer->appList[i].name == "Desktop") {
+            Session* session = new Session(computer, computer->appList[i]);
+            emit sessionCreated("Desktop", session);
+            return;
+        }
+    }
+
+    // If we reach here, Desktop app was not found.
+    // We need to tell the UI to proceed to the AppView.
+    // A simple way is to emit a signal that PcView can connect to.
+    // Let's call it showAppView.
+    // First, add `void showAppView(int computerIndex);` to computermodel.h signals.
+    // Then emit it here.
+    emit showAppView(computerIndex);
 }
 
 #include "computermodel.moc"

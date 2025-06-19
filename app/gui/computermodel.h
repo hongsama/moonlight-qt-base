@@ -45,9 +45,13 @@ public:
 
     Q_INVOKABLE Session* createSessionForCurrentGame(int computerIndex);
 
+    Q_INVOKABLE void findAndStreamDesktop(int computerIndex);
+
 signals:
     void pairingCompleted(QVariant error);
     void connectionTestCompleted(int result, QString blockedPorts);
+    void sessionCreated(QString appName, Session* session);
+    void showAppView(int computerIndex);
 
 private slots:
     void handleComputerStateChanged(NvComputer* computer);

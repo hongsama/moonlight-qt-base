@@ -565,7 +565,7 @@ bool Session::populateDecoderProperties(SDL_Window* window)
 
 Session::Session(NvComputer* computer, NvApp& app, StreamingPreferences *preferences)
     : m_Preferences(preferences ? preferences : StreamingPreferences::get()),
-      m_IsFullScreen(m_Preferences->windowMode != StreamingPreferences::WM_WINDOWED || !WMUtils::isRunningDesktopEnvironment()),
+      m_IsFullScreen(false),
       m_Computer(computer),
       m_App(app),
       m_Window(nullptr),
@@ -1250,10 +1250,7 @@ private:
     void run() override
     {
         // Only quit the running app if our session terminated gracefully
-        bool shouldQuit =
-                !m_Session->m_UnexpectedTermination &&
-                (m_Session->m_Preferences->quitAppAfter ||
-                 m_Session->m_ShouldExitAfterQuit);
+        bool shouldQuit = !m_Session->m_UnexpectedTermination;
 
         // Notify the UI
         if (shouldQuit) {
